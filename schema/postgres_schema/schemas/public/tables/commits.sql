@@ -7,3 +7,4 @@ CREATE TABLE "public"."commits" (
     CONSTRAINT "author_id" FOREIGN KEY ("author_id") REFERENCES "public"."users" ("id"),
     CONSTRAINT "repo_id" FOREIGN KEY ("repo_id") REFERENCES "public"."repos" ("id")
 );
+
