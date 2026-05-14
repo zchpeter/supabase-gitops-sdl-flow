@@ -8,3 +8,4 @@ CREATE TABLE "public"."repos" (
     CONSTRAINT "name" UNIQUE (owner_id, name),
     CONSTRAINT "owner_id" FOREIGN KEY ("owner_id") REFERENCES "public"."users" ("id")
 );
+

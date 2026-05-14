@@ -1,0 +1,35 @@
+CREATE TABLE "auth"."oauth_authorizations" (
+    "id" uuid NOT NULL,
+    "authorization_id" text NOT NULL,
+    "client_id" uuid NOT NULL,
+    "user_id" uuid,
+    "redirect_uri" text NOT NULL,
+    "scope" text NOT NULL,
+    "state" text,
+    "resource" text,
+    "code_challenge" text,
+    "code_challenge_method" auth.code_challenge_method,
+    "response_type" auth.oauth_response_type DEFAULT 'code'::auth.oauth_response_type NOT NULL,
+    "status" auth.oauth_authorization_status DEFAULT 'pending'::auth.oauth_authorization_status NOT NULL,
+    "authorization_code" text,
+    "created_at" timestamp(6) with time zone DEFAULT now() NOT NULL,
+    "expires_at" timestamp(6) with time zone DEFAULT (now() + '00:03:00'::interval) NOT NULL,
+    "approved_at" timestamp(6) with time zone,
+    "nonce" text,
+    CONSTRAINT "oauth_authorizations_pkey" PRIMARY KEY (id),
+    CONSTRAINT "oauth_authorizations_authorization_code_key" UNIQUE (authorization_code),
+    CONSTRAINT "oauth_authorizations_authorization_id_key" UNIQUE (authorization_id),
+    CONSTRAINT "oauth_authorizations_authorization_code_length" CHECK (char_length(authorization_code) <= 255),
+    CONSTRAINT "oauth_authorizations_code_challenge_length" CHECK (char_length(code_challenge) <= 128),
+    CONSTRAINT "oauth_authorizations_expires_at_future" CHECK (expires_at > created_at),
+    CONSTRAINT "oauth_authorizations_nonce_length" CHECK (char_length(nonce) <= 255),
+    CONSTRAINT "oauth_authorizations_redirect_uri_length" CHECK (char_length(redirect_uri) <= 2048),
+    CONSTRAINT "oauth_authorizations_resource_length" CHECK (char_length(resource) <= 2048),
+    CONSTRAINT "oauth_authorizations_scope_length" CHECK (char_length(scope) <= 4096),
+    CONSTRAINT "oauth_authorizations_state_length" CHECK (char_length(state) <= 4096),
+    CONSTRAINT "oauth_authorizations_client_id_fkey" FOREIGN KEY ("client_id") REFERENCES "auth"."oauth_clients" ("id") ON DELETE CASCADE,
+    CONSTRAINT "oauth_authorizations_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users" ("id") ON DELETE CASCADE
+);
+
+CREATE INDEX "oauth_auth_pending_exp_idx" ON "auth"."oauth_authorizations" (expires_at) WHERE status = 'pending'::auth.oauth_authorization_status;
+

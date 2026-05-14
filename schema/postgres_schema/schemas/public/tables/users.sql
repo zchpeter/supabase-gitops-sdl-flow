@@ -3,3 +3,4 @@ CREATE TABLE "public"."users" (
     "name" character varying NOT NULL,
     CONSTRAINT "users_pkey" PRIMARY KEY (id)
 );
+
